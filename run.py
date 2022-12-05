@@ -21,12 +21,14 @@ app = Flask(__name__)
 
 DATABASE = 'database.db'
 
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = 'qwerty'
-app.config['UPLOAD_FOLDER'] = 'files/'
+app.config['UPLOAD_FOLDER'] = os.path.join(APP_ROOT, 'files')
 app.config['IMAGE_FOLDER'] = os.path.join('static', 'image')
 
-with open(os.path.join('static','data','display.pkl'), 'rb') as f:
+with open(os.path.join(APP_ROOT, 'static','data','display.pkl'), 'rb') as f:
     df_display = pickle.load(f)
 hh_nums = list(df_display['HSHD_NUM'].unique())
 
