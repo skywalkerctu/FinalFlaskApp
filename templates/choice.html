@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<center>
+        
+        <form method="post">
+            <p style="font-family:verdana; font-size:18px">
+                <label for="username">Household Number:</label>
+                <br>
+                <input type="text" name="hh_num"
+                       value="{{ request.form['hh_num'] }}"></input>
+
+                <br><br>
+                
+                <button type="submit">Go</button>
+            </p>
+        </form>
+</center>
+    
+{% endblock %}

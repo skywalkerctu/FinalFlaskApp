@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
+    <title>{% block title %} {% endblock %} - FlaskApp</title>
+
+</head>
+<body>
+    <nav>
+        <center>
+            <p style="font-family:verdana;font-size:20px">
+                <a href="{{ url_for('index') }}">Dashboard</a>&nbsp&nbsp&nbsp
+                <a href="{{ url_for('login') }}">Log In</a>&nbsp&nbsp&nbsp
+                <a href="{{ url_for('register') }}">Sign Up</a>&nbsp&nbsp&nbsp
+                <a href="{{ url_for('H10') }}">H10</a>
+                <a href="{{ url_for('choice') }}">View Household</a>
+                <a href="{{ url_for('upload') }}">Upload Custom Data</a>
+                <a href="{{ url_for('choice_custom') }}">View Custom Data</a>
+            </p>
+        </center>
+        <right>
+        <h3 align="right">{{ user_status }}</h2>
+        </right>
+    </nav>
+    <hr>
+    <div class="container">
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+    {% block content %} {% endblock %}
+</div>
+</body>
+</html>

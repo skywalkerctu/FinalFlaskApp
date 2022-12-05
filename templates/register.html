@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1><center>{% block title %} Sign Up {% endblock %}<center></h1>
+    <form method="post" enctype = "multipart/form-data">
+       <center>
+              <p style="font-family:verdana; font-size:18px;"
+                      <label for="username">User name:</label>
+                      <br>
+                      <input type="text" name="username"
+                             value="{{ request.form['username'] }}"></input>
+                      <br><br>
+
+                      <label for="password">Password:</label>
+                      <br>
+                      <input type="password" name="password"
+                             value="{{ request.form['password'] }}"></input>
+                      <br><br>
+
+                      <label for="email">E-mail:</label>
+                      <br>
+                      <input type="email" name="email"
+                             value="{{ request.form['email'] }}"></input>
+                      <br><br>
+
+                      <br>
+                      <button type="submit">Sign Up</button>
+               </p>
+        </center>
+    </form>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form method="post" enctype = "multipart/form-data">
+    <center>
+        <h1>Please wait about 1 minutes after clicking submit for the files to process!</h1>
+        <h2>When it is done you will be notified</h2>
+        <label for="file_h">Household Data: </label>
+        <input type="file" name="file_h" accept=".csv"/>
+        <br>
+        <label for="file_t">Transaction Data: </label>
+        <input type="file" name="file_t" accept=".csv"/>
+        <br>
+        <label for="file_p">Product Data: </label>
+        <input type="file" name="file_p" accept=".csv"/>
+        <br>
+        <button type="submit">Submit</button>
+        <br>
+    </center>
+    </form>
+{% endblock %}

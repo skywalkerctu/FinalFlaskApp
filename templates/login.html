@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1><center>{% block title %} Log In {% endblock %}</center></h1>
+        <center>
+            
+            <form method="post">
+                <p style="font-family:verdana; font-size:18px">
+                    <label for="username">User name:</label>
+                    <br>
+                    <input type="text" name="username"
+                           value="{{ request.form['username'] }}"></input>
+
+                    <br><br>
+                    <label for="password">Password:</label>
+                    <br>
+                    <input type="password" name="password"
+                           value="{{ request.form['password'] }}"></input>
+
+                    <br><br>
+                    
+                    <button type="submit">Log In</button>
+                </p>
+            </form>
+    </center>
+{% endblock %}
