@@ -10,7 +10,6 @@ import sqlite3
 from flask import Flask, request, g, render_template, url_for, flash, redirect, session, Markup
 import os
 import pandas as pd
-import multiprocessing as mp
 app = Flask(__name__)
 
 
@@ -26,12 +25,6 @@ app.config['SECRET_KEY'] = 'qwerty'
 app.config['UPLOAD_FOLDER'] = 'files/'
 app.config['IMAGE_FOLDER'] = os.path.join('static', 'image')
 
-df_display = None
-hh_nums = None
-df_custom = None
-hh_nums_custom = None
-data = None
-finish = None
 
 def connect_to_database():
     return sqlite3.connect(app.config['DATABASE'])
@@ -41,6 +34,41 @@ def get_db():
     if db is None:
         db = g.db = connect_to_database()
     return db
+
+# def organize_users(rows):
+#     users = []
+#     for row in rows:
+#         users.append(
+#             {'username': row[2], 
+#              'password': row[3],
+#              'firstname': row[4],
+#              'lastname': row[5], 
+#              'email': row[6]}
+#             )
+#     return users
+
+# @app.route('/download')
+# def download():
+#     username = session['username']
+#     filename = os.path.join(app.config['UPLOAD_FOLDER'], f'{username}.txt')
+#     return send_file(filename, as_attachment=True, download_name='text file.txt')
+
+# @app.route('/viewm')
+# def viewm():
+#     rows = execute_query("""SELECT * FROM users""")
+#     users = organize_users(rows)
+#     return render_template('viewm.html', users=users)
+#     # return render_template('viewm.html', messages=messages)
+
+# @app.route('/viewinfo')
+# def viewinfo():
+#     username = session['username']
+#     rows = execute_query("""SELECT * FROM users WHERE username=?""", (username,))
+#     users = organize_users(rows)
+#     with open(os.path.join(app.config['UPLOAD_FOLDER'], f'{username}.txt'), 'rb') as f:
+#         data = f.read()
+#         num_words = len(data.split())
+#     return render_template('viewinfo.html', users=users, num_words=num_words)
 
 def get_user_status(s):
     username = s.get('username', None)
@@ -105,17 +133,10 @@ def execute_query(query, args=()):
 def get_HSHD(df, num):
     return df[df['HSHD_NUM']==num].copy()
 
-def task(data, finish):
-    APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-    df_display = pd.read_csv(os.path.join(APP_ROOT,'static','data','display.csv'), index_col=0)
-    hh_nums = list(df_display['HSHD_NUM'].unique())
-    df_custom = pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'], 'display.csv'), index_col=0) if os.path.exists((os.path.join(app.config['UPLOAD_FOLDER'], 'display.csv'))) else None
-    hh_nums_custom = list(df_custom['HSHD_NUM'].unique()) if df_custom is not None else None
-    data.append(df_display)
-    data.append(hh_nums)
-    data.append(df_custom)
-    data.append(hh_nums_custom)
-    finish.set()
+df_display = pd.read_csv(os.path.join('static','data','display.csv'), index_col=0)
+hh_nums = list(df_display['HSHD_NUM'].unique())
+df_custom = pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'], 'display.csv'), index_col=0) if os.path.exists((os.path.join(app.config['UPLOAD_FOLDER'], 'display.csv'))) else None
+hh_nums_custom = list(df_custom['HSHD_NUM'].unique()) if df_custom is not None else None
 
 @app.route('/', methods=("POST", "GET"))
 def index():
@@ -127,19 +148,12 @@ def index():
 
 @app.route('/H10')
 def H10():
-    if not finish.is_set():
-        return render_template('processing.html')
-    else:
-        df_display = data[0]
+    full_filename = os.path.join(app.config['IMAGE_FOLDER'], 'chase.jpg')
     user_status = get_user_status(session)
-    return render_template('h10.html', tables=[get_HSHD(df_display, 10).to_html(classes='data', header='true', index=False)], user_status=user_status)
+    return render_template('h10.html', tables=[get_HSHD(df_display, 10).to_html(classes='data', header='true', index=False)], user_image=full_filename, user_status=user_status)
 
 @app.route('/choice', methods=('GET', 'POST'))
 def choice():
-    if not finish.is_set():
-        return render_template('processing.html')
-    else:
-        hh_nums = data[1]
     if request.method == 'POST':
         hh_num = request.form['hh_num']
 
@@ -159,10 +173,6 @@ def choice():
 
 @app.route('/view_h')
 def view_h():
-    if not finish.is_set():
-        return render_template('processing.html')
-    else:
-        df_display = data[0]
     hh_num = int(session['hh_num'])
     custom = int(session['custom'])
     if custom == 0:
@@ -226,6 +236,15 @@ def choice_custom():
                     return redirect(url_for('view_h'))
         user_status = get_user_status(session)
         return render_template('choice_custom.html', user_status=user_status)
+    
+
+# @app.route('/countme/<input_str>')
+# def count_me(input_str):
+#     input_counter = Counter(input_str)
+#     response = []
+#     for letter, count in input_counter.most_common():
+#         response.append('"{}": {}'.format(letter, count))
+#     return '<br>'.join(response)
 
 def get_date(df, year='YEAR', week='WEEK_NUM'):
     df = df.copy()
@@ -252,10 +271,8 @@ def read(dir_h, dir_t, dir_p):
     return df_display.copy()
 
 if __name__ == '__main__':
-    manager = mp.Manager()
-    data = manager.list()
-    finish = manager.Event()
-    p = mp.Process(target=task, args=(data, finish))
-    p.start()
-    
-    app.run()
+  app.run()
+  
+  
+  
+  
